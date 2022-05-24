@@ -2,10 +2,10 @@
 title: "Diaporama Memoire"
 author: "Elisa HUANG"
 date: "18/04/2022"
-output: 
-  slidy_presentation :
+output:
+  slidy_presentation:
     font_adjustment: -1
-  
+  ioslides_presentation: default
 ---
 ```{r , include = FALSE}
 knitr::opts_chunk$set(
@@ -18,46 +18,11 @@ knitr::opts_chunk$set(
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
-##  *Base de données*
+##  Préparation des données
 ```{r setup, include=FALSE}
 library(haven)
 CAUCP_Germany_Wave1<- read_dta("CAUCP_Germany_Wave1.dta")
 CAUCP_Germany_Wave2 <- read_dta("CAUCP_Germany_Wave2.dta")
-```
-
-A partir de la donnée source, nous crééons un échantillon pour chaque vague qui comportent des données telles que :
-
-- les caractéristiques socio : le genre (C1GERSEXE), l'âge (C1GERAGER), l'éducation (C1GEREDU)
-
-- les comportements sanitaires: se laver les mains plus fréquemment/ longtemps (C1GERCMPTCORO_0), manger dans le creux de son bras ou dans un mouchoir (C1GERCMPTCORO_1), se serrer la main (C1GERCMPTCORO_2), garder au moins un mètre de distance (C1GERCMPTCORO_3), réduire ses mouvements (C1GERCMPTCORO_4), éviter les endroits bondés (C1GERCMPTCORO_5), ne plus voir ses amis (C1GERCMPTCORO_6)
-
-- les différents types de confiance (institutionnelle et interpersonnelle) : la confiance dans la science (C1GERB4_7), la confiance dans le gouvernement (C1GERB4_0), la confiance dans le gouvernement fédéral (C1GERB4_6), la confiance sociale (C1GERCONF1_2) 
-
-- l'état de santé (C1GERSANTE1) 
-
-
-- la satisfaction vis-à-vis des mesures gouvernementales (C1GERGER4ST)
-
-- la prise de risque par rapport à la santé (C1GERRISKGEN_1)
-
-- la perception du risque (C1GERGER5)
-
-Enlevé :
-
-- la sensibilité politique (C1GERQ7) à justifier??? (psq trop peu de pv explicatif et en + allemagne pas trop polarisé)
-- urbanisation (C2GERDEGURB) 
-- la région (C1GERREG16)
-
-remarques :
-
-- varaible de religion aurait pu être intéressant mais pas dispo
-- vaccin, port du masque
-- bizarre que effet cumulatif ya rien
-- gouv fed effet nulle dès qu'il y a satisfaction gestion gouv fed
-
-Remarque : Nous créeons un indicateur de comportement (behav) qui regroupe les variables de comportements : behav1 et behav2
-
-```{r include=FALSE}
 
 ## Création de l'indice
 
@@ -67,9 +32,9 @@ CAUCP_Germany_Wave2$behav2<-apply(CAUCP_Germany_Wave2[,c("C2GERCMPTCORO_0","C2GE
 
 ## Création des échantillons 
 
-datasub1<-CAUCP_Germany_Wave1[,c("IDN","IDINT","C1GERSEXE","C1GERAGER","C1GERRISKGEN_1","C1GERCONF1_2","C1GERB4_0","C1GERB4_7","behav1","C1GERCMPTCORO_0","C1GERCMPTCORO_1","C1GERCMPTCORO_2","C1GERCMPTCORO_3","C1GERCMPTCORO_4","C1GERCMPTCORO_5","C1GERCMPTCORO_6","C1GEREDU","C1GERGER4ST","C1GERGER5","C1GERB4_6")]
+datasub1<-CAUCP_Germany_Wave1[,c("IDN","IDINT","C1GERSEXE","C1GERAGER","C1GERRISKGEN_1","C1GERCONF1_2","C1GERB4_0","C1GERB4_7","behav1","C1GERCMPTCORO_0","C1GERCMPTCORO_1","C1GERCMPTCORO_2","C1GERCMPTCORO_3","C1GERCMPTCORO_4","C1GERCMPTCORO_5","C1GERCMPTCORO_6","C1GEREDU","C1GERGER5","C1GERB4_6","C1GERINC")]
 
-datasub2<-CAUCP_Germany_Wave2[,c("IDN","IDINT","C2GERSEXE","C2GERAGER","C2GERRISKGEN_1","C2GERCONF1_2","C2GERB4_0","C2GERB4_7","behav2","C2GERCMPTCORO_0","C2GERCMPTCORO_1","C2GERCMPTCORO_2","C2GERCMPTCORO_3","C2GERCMPTCORO_4","C2GERCMPTCORO_5","C2GERCMPTCORO_6","C2GEREDU","C2GERSATISCORGERST","C2GERGER5","C2GERB4_6")]
+datasub2<-CAUCP_Germany_Wave2[,c("IDN","IDINT","C2GERSEXE","C2GERAGER","C2GERRISKGEN_1","C2GERCONF1_2","C2GERB4_0","C2GERB4_7","behav2","C2GERCMPTCORO_0","C2GERCMPTCORO_1","C2GERCMPTCORO_2","C2GERCMPTCORO_3","C2GERCMPTCORO_4","C2GERCMPTCORO_5","C2GERCMPTCORO_6","C2GEREDU","C2GERGER5","C2GERB4_6","C2GERINC")]
 
 ## Traiter les NA 
 
@@ -77,6 +42,18 @@ datasub1$C1GERRISKGEN_1<-ifelse(datasub1$C1GERRISKGEN_1==99,NA,datasub1$C1GERRIS
 
 datasub2$C2GERRISKGEN_1<-ifelse(datasub2$C2GERRISKGEN_1==99,NA,datasub2$C2GERRISKGEN_1)
 datasub2$C2GERCONF1_2<-ifelse(datasub2$C2GERCONF1_2==99,NA,datasub2$C2GERCONF1_2)
+
+datasub1$C1GERINC<-ifelse(datasub1$C1GERINC==99,NA,datasub1$C1GERINC)
+datasub2$C2GERINC<-ifelse(datasub2$C2GERINC==99,NA,datasub2$C2GERINC)
+datasub2$C2GERINC<-ifelse(datasub2$C2GERINC==14,NA,datasub2$C2GERINC)
+
+datasub1$C1GERINC <- factor(datasub1$C1GERINC,labels=c("1","1","1","1","2","2","2","2","2","3","3","3","3"))
+datasub1$C1GERINC <- as.numeric(datasub1$C1GERINC)
+
+datasub2$C2GERINC <- factor(datasub2$C2GERINC,labels=c("1","1","1","1","2","2","2","2","2","3","3","3","3"))
+datasub2$C2GERINC <- as.numeric(datasub2$C2GERINC)
+
+summary(datasub2$C2GERINC)
 
 ## Recodage des variables
 
@@ -89,9 +66,6 @@ datasub1$C1GERRISKGEN_1<-datasub1$C1GERRISKGEN_1-1
 
 # genre : homme (0), femme (1)
 datasub1$C1GERSEXE <- ifelse(datasub1$C1GERSEXE == 1, 1, 0)
-
-# satisfaction : pas satisfait (0), satisfait (1)
-datasub1$C1GERGER4ST <- ifelse(datasub1$C1GERGER4ST == 2, 0, 1)
 
 # confiance sociale :  pas confiance (0)/ confiance (1) 
 datasub1$C1GERCONF1_2<-replace(datasub1$C1GERCONF1_2, datasub1$C1GERCONF1_2<3, 1)
@@ -113,11 +87,11 @@ datasub1$C1GERB4_6<-replace(datasub1$C1GERB4_6, datasub1$C1GERB4_6>2, 0)
 datasub1$C1GEREDU<-replace(datasub1$C1GEREDU, datasub1$C1GEREDU<5, 0)
 datasub1$C1GEREDU<-replace(datasub1$C1GEREDU, datasub1$C1GEREDU>4, 1)
 
-
-
 library(fastDummies)
 
 datasub1 <- dummy_cols(datasub1, select_columns = "C1GERAGER")
+datasub1 <- dummy_cols(datasub1, select_columns = "C1GERINC")
+
 
 # VAGUE 2
 
@@ -130,9 +104,6 @@ datasub2$C2GERRISKGEN_1<-datasub2$C2GERRISKGEN_1-1
 
 # genre : homme (0), femme (1)
 datasub2$C2GERSEXE <- ifelse(datasub2$C2GERSEXE == 1, 1, 0)
-
-# satisfaction : pas satisfait (0), satisfait (1)
-datasub2$C2GERSATISCORGERST <- ifelse(datasub2$C2GERSATISCORGERST == 2, 0, 1)
 
 # confiance  gouvernement fédéral : pas confiance (0)/ confiance (1)
 datasub2$C2GERB4_6<-replace(datasub2$C2GERB4_6, datasub2$C2GERB4_6<3, 1)
@@ -158,9 +129,67 @@ datasub2$C2GEREDU<-replace(datasub2$C2GEREDU, datasub2$C2GEREDU>4, 1)
 library(fastDummies)
 
 datasub2 <- dummy_cols(datasub2, select_columns = "C2GERAGER")
+datasub2 <- dummy_cols(datasub2, select_columns = "C2GERINC")
+
+# Renommer les variables
+
+library(dplyr)
+datasub1<-rename(datasub1, c("Sexe"="C1GERSEXE",
+                              "Âge"="C1GERAGER",
+                              "Âge [18-34]"="C1GERAGER_1",
+                              "Âge [35-49]"="C1GERAGER_2",
+                              "Âge [50-59]"="C1GERAGER_3",
+                              "Âge [65+]"="C1GERAGER_4",
+                              "Education"="C1GEREDU", 
+                              "Indice de comportement"="behav1",
+                              "Se laver les mains"="C1GERCMPTCORO_0",
+                              "Eternuer dans le coude"="C1GERCMPTCORO_1",
+                              "Se serrer les mains"="C1GERCMPTCORO_2",
+                              "1m de distance"="C1GERCMPTCORO_3",
+                              "Réduire les mouvements"="C1GERCMPTCORO_4",
+                              "Eviter les endroits bondés"="C1GERCMPTCORO_5",
+                              "Voir ses amis"="C1GERCMPTCORO_6",
+                              "Confiance sociale"="C1GERCONF1_2",
+                              "Confiance dans le gouvernement du pays"="C1GERB4_0",
+                              "Confiance dans le gouvernement fédéral"="C1GERB4_6",
+                              "Confiance dans les scientifiques"="C1GERB4_7",
+                              "Aversion au risque"="C1GERRISKGEN_1",
+                              "Risque de contamination"="C1GERGER5",
+                             "Revenu"="C1GERINC",
+                             "Revenu [0-1250 euros]"="C1GERINC_1",
+                             "Revenu [1251-3000 euros]"="C1GERINC_2",
+                             "Revenu [3001 euros+]"="C1GERINC_3",
+                              ))
+
+datasub2<- rename(datasub2, c("Sexe"="C2GERSEXE",
+                              "Âge"="C2GERAGER",
+                              "Âge [18-34]"="C2GERAGER_1",
+                              "Âge [35-49]"="C2GERAGER_2",
+                              "Âge [50-59]"="C2GERAGER_3",
+                              "Âge [65+]"="C2GERAGER_4",
+                              "Education"="C2GEREDU", 
+                              "Indice de comportement"="behav2",
+                              "Se laver les mains"="C2GERCMPTCORO_0",
+                              "Eternuer dans le coude"="C2GERCMPTCORO_1",
+                              "Se serrer les mains"="C2GERCMPTCORO_2",
+                              "1m de distance"="C2GERCMPTCORO_3",
+                              "Réduire les mouvements"="C2GERCMPTCORO_4",
+                              "Eviter les endroits bondés"="C2GERCMPTCORO_5",
+                              "Voir ses amis"="C2GERCMPTCORO_6",
+                              "Confiance sociale"="C2GERCONF1_2",
+                              "Confiance dans le gouvernement du pays"="C2GERB4_0",
+                              "Confiance dans le gouvernement fédéral"="C2GERB4_6",
+                              "Confiance dans les scientifiques"="C2GERB4_7",
+                              "Aversion au risque"="C2GERRISKGEN_1",
+                              "Risque de contamination"="C2GERGER5",
+                              "Revenu"="C2GERINC",
+                             "Revenu [0-1250 euros]"="C2GERINC_1",
+                             "Revenu [1251-3000 euros]"="C2GERINC_2",
+                             "Revenu [3001 euros+]"="C2GERINC_3",
+                              ))
 ```
 
-## *Statistiques descriptives*
+## Statistiques descriptives
 
 ```{r warning=FALSE, include=FALSE}
 library(rstatix)
@@ -170,152 +199,127 @@ library(dplyr)
 ```
 
 ```{r echo=FALSE}
-stat1 <-get_summary_stats(datasub1, show = c("mean", "sd", "min", "max"))
+stat1 <-get_summary_stats(datasub1[-4], show = c("mean", "sd", "min", "max"))
 kable(stat1, digits = 2) %>% kable_classic_2() %>% kable_styling(font_size = 15, )
-```
 
-## *Statistiques descriptives*
-
-```{r}
 stat2 <-get_summary_stats(datasub2, show = c("mean", "sd", "min", "max"))
 kable(stat2, digits = 2) %>% kable_classic_2() %>% kable_styling(font_size = 15, )
 ```
+stat1 <-get_summary_stats(datasub1[-4,-29], show = c("mean", "sd", "min", "max"))
+kable(stat1, digits = 2) %>% kable_classic_2() %>% kable_styling(font_size = 15, )
+
+stat2 <-get_summary_stats(datasub2[-4,-29], show = c("mean", "sd", "min", "max"))
+kable(stat2, digits = 2) %>% kable_classic_2() %>% kable_styling(font_size = 15, )
 
 
+# Tableau de régression : Vague 1
 ```{r}
-Modele0<-lm(behav1~C1GERB4_7,
+
+Modele0<-lm(`Indice de comportement`~`Confiance dans les scientifiques`,
             data=datasub1)
 
 # ajout des caractéristiques individuelles : sexe, âge, éducation et état de santé
-Modele1<-lm(behav1~C1GERB4_7+C1GERSEXE+C1GERAGER_1+C1GERAGER_2+C1GERAGER_3+C1GEREDU,data=datasub1)
+Modele1<-lm(`Indice de comportement`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Revenu [0-1250 euros]`+`Revenu [1251-3000 euros]`,data=datasub1)
 
 # ajout de l'aversité face au risque et perception de la menace
 
-Modele2<-lm(behav1~C1GERB4_7+C1GERSEXE+C1GERAGER_1+C1GERAGER_2+C1GERAGER_3+C1GEREDU+C1GERRISKGEN_1+C1GERGER5,data=datasub1)
+Modele2<-lm(`Indice de comportement`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Revenu [0-1250 euros]`+`Revenu [1251-3000 euros]`+`Aversion au risque`+`Risque de contamination`,data=datasub1)
 
 # ajout des différents types de confiance la confiance politique (gouvernement et gouvernement fédéral) et sociale  
 
-Modele3<-lm(behav1~C1GERB4_7+C1GERSEXE+C1GERAGER_1+C1GERAGER_2+C1GERAGER_3+C1GEREDU+C1GERRISKGEN_1+C1GERGER5+C1GERB4_0+C1GERB4_6+C1GERCONF1_2,data=datasub1)
+Modele3<-lm(`Indice de comportement`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Revenu [0-1250 euros]`+`Revenu [1251-3000 euros]`+`Aversion au risque`+`Risque de contamination`+`Confiance dans le gouvernement du pays`+`Confiance dans le gouvernement fédéral`+`Confiance sociale`,data=datasub1)
 
-# ajout de la satisfaction vis-à-vis de la gestion épidémique 
-
-Modele4<-lm(behav1~C1GERB4_7+C1GERSEXE+C1GERAGER_1+C1GERAGER_2+C1GERAGER_3+C1GEREDU+C1GERRISKGEN_1+C1GERGER5+C1GERB4_0+C1GERB4_6+C1GERCONF1_2+C1GERGER4ST,data=datasub1)
 
 # effet cumulatif
-Modele5<-lm(behav1~C1GERB4_7+C1GERSEXE+C1GERAGER_1+C1GERAGER_2+C1GERAGER_3+C1GEREDU+C1GERRISKGEN_1+C1GERGER5+C1GERB4_0+C1GERB4_6+C1GERCONF1_2+C1GERGER4ST+(C1GERB4_7*C1GERRISKGEN_1),data=datasub1)
+Modele4<-lm(`Indice de comportement`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Revenu [0-1250 euros]`+`Revenu [1251-3000 euros]`+`Aversion au risque`+`Risque de contamination`+`Confiance dans le gouvernement du pays`+`Confiance dans le gouvernement fédéral`+`Confiance sociale`+(`Confiance dans les scientifiques`*`Aversion au risque`),data=datasub1)
 
 # modèle complet
 
-Modele6<-lm(behav1~C1GERB4_7+C1GERSEXE+C1GERAGER_1+C1GERAGER_2+C1GERRISKGEN_1+C1GERGER5+C1GERB4_0+C1GERB4_6,data=datasub1)
-```
+Modele5<-lm(`Indice de comportement`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Revenu [0-1250 euros]`+`Revenu [1251-3000 euros]`+`Aversion au risque`+`Risque de contamination`+`Confiance dans le gouvernement du pays`+`Confiance dans le gouvernement fédéral`,data=datasub1)
 
-## VAGUE 1 : summary du modèle complet
-
-
-
-```{r}
-summary(Modele5)
-```
-
-## VAGUE 1 : Tableau de régression 
-
-```{r}
 library(sjPlot)
 
 tab_model(
-  Modele1,Modele2,Modele3,Modele4,Modele5,Modele6,
+  Modele1,Modele2,Modele3,Modele4,Modele5,
   digits=2, 
   show.ci = FALSE, 
   show.se = TRUE,
+  pred.labels = TRUE,
   show.p = TRUE, 
   p.style = "stars", 
   vcov.fun = "vcovHC", 
   vcov.type = "HC1", 
   string.pred = " ", 
+  string.ci = "CI",
   string.est = "Mean (se)", 
   collapse.se = TRUE, 
   dv.labels = c("(1)","(2)","(3)","(4)","(5)","(6)"))
 ```
 
+## Modèle vague 2
+```{r}
+
+Modele0<-lm(`Indice de comportement`~`Confiance dans les scientifiques`,
+            data=datasub2)
+
+# ajout des caractéristiques individuelles : sexe, âge, éducation et état de santé
+Modele1<-lm(`Indice de comportement`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Revenu [0-1250 euros]`+`Revenu [1251-3000 euros]`,data=datasub2)
+
+# ajout de l'aversion face au risque et perception de la menace
+
+Modele2<-lm(`Indice de comportement`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Revenu [0-1250 euros]`+`Revenu [1251-3000 euros]`+`Aversion au risque`+`Risque de contamination`,data=datasub2)
+
+# ajout des différents types de confiance la confiance politique (gouvernement et gouvernement fédéral) et sociale  
+
+Modele3<-lm(`Indice de comportement`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Revenu [0-1250 euros]`+`Revenu [1251-3000 euros]`+`Aversion au risque`+`Risque de contamination`+`Confiance dans le gouvernement du pays`+`Confiance dans le gouvernement fédéral`+`Confiance sociale`,data=datasub2)
+
+# effet cumulatif 
+Modele4<-lm(`Indice de comportement`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Revenu [0-1250 euros]`+`Revenu [1251-3000 euros]`+`Aversion au risque`+`Risque de contamination`+`Confiance dans le gouvernement du pays`+`Confiance dans le gouvernement fédéral`+`Confiance sociale`+(`Confiance dans les scientifiques`*`Aversion au risque`),data=datasub2)
+
+# modèle complet
+Modele5<-lm(`Indice de comportement`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Aversion au risque`+`Risque de contamination`+`Confiance dans le gouvernement fédéral`,data=datasub2)
+
+library(sjPlot)
+
+tab_model(
+  Modele1,Modele2,Modele3,Modele4,Modele5,
+  digits=2, 
+  show.ci = FALSE, 
+  show.se = TRUE,
+  pred.labels = TRUE,
+  show.p = TRUE, 
+  p.style = "stars", 
+  vcov.fun = "vcovHC", 
+  vcov.type = "HC1", 
+  string.pred = " ", 
+  string.ci = "CI",
+  string.est = "Mean (se)", 
+  collapse.se = TRUE, 
+  dv.labels = c("(1)","(2)","(3)","(4)","(5)"))
+
+```
 ## VAGUE 1 : Validité du modèle
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 
 par(mfrow=c(2,2))
-plot(Modele6, 1, main = "Modele1")
-plot(Modele6, 1, main = "Modele2")
-plot(Modele6, 1, main = "Modele3")
-plot(Modele6, 1, main = "Modele4")
+plot(Modele5, 1, main = "Modele1")
+plot(Modele5, 1, main = "Modele2")
+plot(Modele5, 1, main = "Modele3")
+plot(Modele5, 1, main = "Modele4")
 
 library(performance)
-check_model(Modele6)
+check_model(Modele5)
 
 library(nortest)
-lillie.test(Modele6$residuals)
-shapiro.test(residuals(Modele6))
+lillie.test(Modele5$residuals)
+shapiro.test(residuals(Modele5))
 
 library(lmtest)
-bptest(Modele6)
+bptest(Modele5)
 
 library(car)
-vif(Modele6)
-```
-
-
-## Modèle vague 2
-```{r}
-
-Modele0<-lm(behav2~C2GERB4_7,
-            data=datasub2)
-
-# ajout des caractéristiques individuelles : sexe, âge, éducation et état de santé
-Modele1<-lm(behav2~C2GERB4_7+C2GERSEXE+C2GERAGER_1+C2GERAGER_2+C2GERAGER_3+C2GEREDU,data=datasub2)
-
-# ajout de l'aversion face au risque et perception de la menace
-
-Modele2<-lm(behav2~C2GERB4_7+C2GERSEXE+C2GERAGER_1+C2GERAGER_2+C2GERAGER_3+C2GEREDU+C2GERRISKGEN_1+C2GERGER5,data=datasub2)
-
-# ajout des différents types de confiance la confiance politique (gouvernement et gouvernement fédéral) et sociale  
-
-Modele3<-lm(behav2~C2GERB4_7+C2GERSEXE+C2GERAGER_1+C2GERAGER_2+C2GERAGER_3+C2GEREDU+C2GERRISKGEN_1+C2GERGER5+C2GERB4_0+C2GERB4_6+C2GERCONF1_2,data=datasub2)
-
-# ajout de la satisfaction vis-à-vis de la gestion épidémique 
-
-Modele4<-lm(behav2~C2GERB4_7+C2GERSEXE+C2GERAGER_1+C2GERAGER_2+C2GERAGER_3+C2GEREDU+C2GERRISKGEN_1+C2GERGER5+C2GERB4_0+C2GERB4_6+C2GERCONF1_2+C2GERSATISCORGERST,data=datasub2)
-
-# effet cumulatif 
-Modele5<-lm(behav2~C2GERB4_7+C2GERSEXE+C2GERAGER_1+C2GERAGER_2+C2GERAGER_3+C2GEREDU+C2GERRISKGEN_1+C2GERGER5+C2GERB4_0+C2GERB4_6+C2GERCONF1_2+C2GERSATISCORGERST+(C2GERB4_7*C2GERRISKGEN_1),data=datasub2)
-
-# modèle complet
-Modele6<-lm(behav2~C2GERB4_7+C2GERSEXE+C2GERAGER_1+C2GERAGER_2+C2GERRISKGEN_1+C2GERGER5+C2GERB4_0+C2GERB4_6+C2GERSATISCORGERST,data=datasub2)
-
-```
-
-
-## VAGUE 2 : summary du modèle complet
-
-```{r}
-summary(Modele2)
-```
-
-## VAGUE 2 : Tableau de régression
-
-```{r}
-library(sjPlot)
-
-tab_model(
-  Modele1,Modele2,Modele3,Modele4,Modele5,Modele6,
-  digits=2, 
-  show.ci = FALSE, 
-  show.se = TRUE,
-  show.p = TRUE, 
-  p.style = "stars", 
-  vcov.fun = "vcovHC", 
-  vcov.type = "HC1", 
-  string.pred = " ", 
-  string.est = "Mean (se)", 
-  collapse.se = TRUE, 
-  dv.labels = c("(1)","(2)","(3)","(4)","(5)","(6)"))
+vif(Modele5)
 ```
 
 ## VAGUE 2 : Validité du modèle
@@ -323,52 +327,54 @@ tab_model(
 ```{r}
 
 par(mfrow=c(2,2))
-plot(Modele6, 1, main = "Modele1")
-plot(Modele6, 1, main = "Modele2")
-plot(Modele6, 1, main = "Modele3")
-plot(Modele6, 1, main = "Modele4")
+plot(Modele5, 1, main = "Modele1")
+plot(Modele5, 1, main = "Modele2")
+plot(Modele5, 1, main = "Modele3")
+plot(Modele5, 1, main = "Modele4")
 
 library(performance)
-check_model(Modele6)
+check_model(Modele5)
 
 library(nortest)
-lillie.test(Modele6$residuals)
-shapiro.test(residuals(Modele6))
+lillie.test(Modele5$residuals)
+shapiro.test(residuals(Modele5))
 
 library(lmtest)
-bptest(Modele6)
+bptest(Modele5)
 
 library(car)
-vif(Modele6)
+vif(Modele5)
 ```
 
-## C1GERCMPTCORO_0
+# Par index
+
+## `Se laver les mains`
 
 ```{r}
-Modele0<-lm(C1GERCMPTCORO_0~C1GERB4_7,
+Modele0<-lm(`Se laver les mains`~`Confiance dans les scientifiques`,
             data=datasub1)
 
 # ajout des caractéristiques individuelles : sexe, âge, éducation et état de santé
-Modele1<-lm(C1GERCMPTCORO_0~C1GERB4_7+C1GERSEXE+C1GERAGER_1+C1GERAGER_2+C1GERAGER_3+C1GEREDU,data=datasub1)
+Modele1<-lm(`Se laver les mains`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`,data=datasub1)
 
 # ajout de l'aversité face au risque et perception de la menace
 
-Modele2<-lm(C1GERCMPTCORO_0~C1GERB4_7+C1GERSEXE+C1GERAGER_1+C1GERAGER_2+C1GERAGER_3+C1GEREDU+C1GERRISKGEN_1+C1GERGER5,data=datasub1)
+Modele2<-lm(`Se laver les mains`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Aversion au risque`+`Risque de contamination`,data=datasub1)
 
 # ajout des différents types de confiance la confiance politique (gouvernement et gouvernement fédéral) et sociale  
 
-Modele3<-lm(C1GERCMPTCORO_0~C1GERB4_7+C1GERSEXE+C1GERAGER_1+C1GERAGER_2+C1GERAGER_3+C1GEREDU+C1GERRISKGEN_1+C1GERGER5+C1GERB4_0+C1GERB4_6+C1GERCONF1_2,data=datasub1)
+Modele3<-lm(`Se laver les mains`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Aversion au risque`+`Risque de contamination`+`Confiance dans le gouvernement du pays`+`Confiance dans le gouvernement fédéral`+`Confiance sociale`,data=datasub1)
 
 # ajout de la satisfaction vis-à-vis de la gestion épidémique 
 
-Modele4<-lm(C1GERCMPTCORO_0~C1GERB4_7+C1GERSEXE+C1GERAGER_1+C1GERAGER_2+C1GERAGER_3+C1GEREDU+C1GERRISKGEN_1+C1GERGER5+C1GERB4_0+C1GERB4_6+C1GERCONF1_2+C1GERGER4ST,data=datasub1)
+Modele4<-lm(`Se laver les mains`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Aversion au risque`+`Risque de contamination`+`Confiance dans le gouvernement du pays`+`Confiance dans le gouvernement fédéral`+`Confiance sociale`,data=datasub1)
 
 # effet cumulatif
-Modele5<-lm(C1GERCMPTCORO_0~C1GERB4_7+C1GERSEXE+C1GERAGER_1+C1GERAGER_2+C1GERAGER_3+C1GEREDU+C1GERRISKGEN_1+C1GERGER5+C1GERB4_0+C1GERB4_6+C1GERCONF1_2+C1GERGER4ST+(C1GERB4_7*C1GERRISKGEN_1),data=datasub1)
+Modele5<-lm(`Se laver les mains`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Aversion au risque`+`Risque de contamination`+`Confiance dans le gouvernement du pays`+`Confiance dans le gouvernement fédéral`+`Confiance sociale`+(`Confiance dans les scientifiques`*`Aversion au risque`),data=datasub1)
 
 # modèle complet
 
-Modele6<-lm(C1GERCMPTCORO_0~C1GERB4_7+C1GERSEXE+C1GERAGER_1+C1GERAGER_2+C1GERRISKGEN_1+C1GERGER5+C1GERB4_6,data=datasub1)
+Modele6<-lm(`Se laver les mains`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Aversion au risque`+`Risque de contamination`+`Confiance dans le gouvernement fédéral`,data=datasub1)
 
 tab_model(
   Modele1,Modele2,Modele3,Modele4,Modele5,Modele6,
@@ -382,36 +388,36 @@ tab_model(
   string.pred = " ", 
   string.est = "Mean (se)", 
   collapse.se = TRUE, 
-  dv.labels = c("(1)","(2)","(3)","(4)","(5)","(6)"))
+  dv.labels = c("(1)","(2)","(3)","(4)","(5)"))
 ```
 
-## C2GERCMPTCORO_0 
+## `Se laver les mains` 
 
 ```{r}
 
-Modele0<-lm(C2GERCMPTCORO_0~C2GERB4_7,
+Modele0<-lm(`Se laver les mains`~`Confiance dans les scientifiques`,
             data=datasub2)
 
 # ajout des caractéristiques individuelles : sexe, âge, éducation et état de santé
-Modele1<-lm(C2GERCMPTCORO_0~C2GERB4_7+C2GERSEXE+C2GERAGER_1+C2GERAGER_2+C2GERAGER_3+C2GEREDU,data=datasub2)
+Modele1<-lm(`Se laver les mains`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`,data=datasub2)
 
 # ajout de l'aversion face au risque et perception de la menace
 
-Modele2<-lm(C2GERCMPTCORO_0~C2GERB4_7+C2GERSEXE+C2GERAGER_1+C2GERAGER_2+C2GERAGER_3+C2GEREDU+C2GERRISKGEN_1+C2GERGER5,data=datasub2)
+Modele2<-lm(`Se laver les mains`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Aversion au risque`+`Risque de contamination`,data=datasub2)
 
 # ajout des différents types de confiance la confiance politique (gouvernement et gouvernement fédéral) et sociale  
 
-Modele3<-lm(C2GERCMPTCORO_0~C2GERB4_7+C2GERSEXE+C2GERAGER_1+C2GERAGER_2+C2GERAGER_3+C2GEREDU+C2GERRISKGEN_1+C2GERGER5+C2GERB4_0+C2GERB4_6+C2GERCONF1_2,data=datasub2)
+Modele3<-lm(`Se laver les mains`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Aversion au risque`+`Risque de contamination`+`Confiance dans le gouvernement du pays`+`Confiance dans le gouvernement fédéral`+`Confiance sociale`,data=datasub2)
 
 # ajout de la satisfaction vis-à-vis de la gestion épidémique 
 
-Modele4<-lm(C2GERCMPTCORO_0~C2GERB4_7+C2GERSEXE+C2GERAGER_1+C2GERAGER_2+C2GERAGER_3+C2GEREDU+C2GERRISKGEN_1+C2GERGER5+C2GERB4_0+C2GERB4_6+C2GERCONF1_2+C2GERSATISCORGERST,data=datasub2)
+Modele4<-lm(`Se laver les mains`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Aversion au risque`+`Risque de contamination`+`Confiance dans le gouvernement du pays`+`Confiance dans le gouvernement fédéral`+`Confiance sociale`,data=datasub2)
 
 # effet cumulatif 
-Modele5<-lm(C2GERCMPTCORO_0~C2GERB4_7+C2GERSEXE+C2GERAGER_1+C2GERAGER_2+C2GERAGER_3+C2GEREDU+C2GERRISKGEN_1+C2GERGER5+C2GERB4_0+C2GERB4_6+C2GERCONF1_2+C2GERSATISCORGERST+(C2GERB4_7*C2GERRISKGEN_1),data=datasub2)
+Modele5<-lm(`Se laver les mains`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Aversion au risque`+`Risque de contamination`+`Confiance dans le gouvernement du pays`+`Confiance dans le gouvernement fédéral`+`Confiance sociale`+(`Confiance dans les scientifiques`*`Aversion au risque`),data=datasub2)
 
 # modèle complet
-Modele6<-lm(C2GERCMPTCORO_0~C2GERSEXE+C2GERAGER_1+C2GERSATISCORGERST,data=datasub2)
+Modele6<-lm(`Se laver les mains`~`Sexe`+`Âge [18-34]`,data=datasub2)
 
 library(sjPlot)
 
@@ -430,33 +436,33 @@ tab_model(
   dv.labels = c("(1)","(2)","(3)","(4)","(5)","(6)"))
 ```
 
-## C1GERCMPTCORO_1 
+## `Eternuer dans le coude` 
 
 ```{r}
-Modele0<-lm(C1GERCMPTCORO_1~C1GERB4_7,
+Modele0<-lm(`Eternuer dans le coude`~`Confiance dans les scientifiques`,
             data=datasub1)
 
 # ajout des caractéristiques individuelles : sexe, âge, éducation et état de santé
-Modele1<-lm(C1GERCMPTCORO_1~C1GERB4_7+C1GERSEXE+C1GERAGER_1+C1GERAGER_2+C1GERAGER_3+C1GEREDU,data=datasub1)
+Modele1<-lm(`Eternuer dans le coude`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`,data=datasub1)
 
 # ajout de l'aversité face au risque et perception de la menace
 
-Modele2<-lm(C1GERCMPTCORO_1~C1GERB4_7+C1GERSEXE+C1GERAGER_1+C1GERAGER_2+C1GERAGER_3+C1GEREDU+C1GERRISKGEN_1+C1GERGER5,data=datasub1)
+Modele2<-lm(`Eternuer dans le coude`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Aversion au risque`+`Risque de contamination`,data=datasub1)
 
 # ajout des différents types de confiance la confiance politique (gouvernement et gouvernement fédéral) et sociale  
 
-Modele3<-lm(C1GERCMPTCORO_1~C1GERB4_7+C1GERSEXE+C1GERAGER_1+C1GERAGER_2+C1GERAGER_3+C1GEREDU+C1GERRISKGEN_1+C1GERGER5+C1GERB4_0+C1GERB4_6+C1GERCONF1_2,data=datasub1)
+Modele3<-lm(`Eternuer dans le coude`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Aversion au risque`+`Risque de contamination`+`Confiance dans le gouvernement du pays`+`Confiance dans le gouvernement fédéral`+`Confiance sociale`,data=datasub1)
 
 # ajout de la satisfaction vis-à-vis de la gestion épidémique 
 
-Modele4<-lm(C1GERCMPTCORO_1~C1GERB4_7+C1GERSEXE+C1GERAGER_1+C1GERAGER_2+C1GERAGER_3+C1GEREDU+C1GERRISKGEN_1+C1GERGER5+C1GERB4_0+C1GERB4_6+C1GERCONF1_2+C1GERGER4ST,data=datasub1)
+Modele4<-lm(`Eternuer dans le coude`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Aversion au risque`+`Risque de contamination`+`Confiance dans le gouvernement du pays`+`Confiance dans le gouvernement fédéral`+`Confiance sociale`,data=datasub1)
 
 # effet cumulatif
-Modele5<-lm(C1GERCMPTCORO_1~C1GERB4_7+C1GERSEXE+C1GERAGER_1+C1GERAGER_2+C1GERAGER_3+C1GEREDU+C1GERRISKGEN_1+C1GERGER5+C1GERB4_0+C1GERB4_6+C1GERCONF1_2+C1GERGER4ST+(C1GERB4_7*C1GERRISKGEN_1),data=datasub1)
+Modele5<-lm(`Eternuer dans le coude`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Aversion au risque`+`Risque de contamination`+`Confiance dans le gouvernement du pays`+`Confiance dans le gouvernement fédéral`+`Confiance sociale`+(`Confiance dans les scientifiques`*`Aversion au risque`),data=datasub1)
 
 # modèle complet
 
-Modele6<-lm(C1GERCMPTCORO_1~C1GERSEXE+C1GERAGER_1+C1GERAGER_2+C1GERRISKGEN_1+C1GERGER5+C1GERB4_0+C1GERB4_6,data=datasub1)
+Modele6<-lm(`Eternuer dans le coude`~`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Aversion au risque`+`Risque de contamination`+`Confiance dans le gouvernement du pays`+`Confiance dans le gouvernement fédéral`,data=datasub1)
 
 tab_model(
   Modele1,Modele2,Modele3,Modele4,Modele5,Modele6,
@@ -473,33 +479,33 @@ tab_model(
   dv.labels = c("(1)","(2)","(3)","(4)","(5)","(6)"))
 ```
 
-## C2GERCMPTCORO_1 
+## `Eternuer dans le coude` 
 
 ```{r}
 
-Modele0<-lm(C2GERCMPTCORO_1~C2GERB4_7,
+Modele0<-lm(`Eternuer dans le coude`~`Confiance dans les scientifiques`,
             data=datasub2)
 
 # ajout des caractéristiques individuelles : sexe, âge, éducation et état de santé
-Modele1<-lm(C2GERCMPTCORO_1~C2GERB4_7+C2GERSEXE+C2GERAGER_1+C2GERAGER_2+C2GERAGER_3+C2GEREDU,data=datasub2)
+Modele1<-lm(`Eternuer dans le coude`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`,data=datasub2)
 
 # ajout de l'aversion face au risque et perception de la menace
 
-Modele2<-lm(C2GERCMPTCORO_1~C2GERB4_7+C2GERSEXE+C2GERAGER_1+C2GERAGER_2+C2GERAGER_3+C2GEREDU+C2GERRISKGEN_1+C2GERGER5,data=datasub2)
+Modele2<-lm(`Eternuer dans le coude`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Aversion au risque`+`Risque de contamination`,data=datasub2)
 
 # ajout des différents types de confiance la confiance politique (gouvernement et gouvernement fédéral) et sociale  
 
-Modele3<-lm(C2GERCMPTCORO_1~C2GERB4_7+C2GERSEXE+C2GERAGER_1+C2GERAGER_2+C2GERAGER_3+C2GEREDU+C2GERRISKGEN_1+C2GERGER5+C2GERB4_0+C2GERB4_6+C2GERCONF1_2,data=datasub2)
+Modele3<-lm(`Eternuer dans le coude`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Aversion au risque`+`Risque de contamination`+`Confiance dans le gouvernement du pays`+`Confiance dans le gouvernement fédéral`+`Confiance sociale`,data=datasub2)
 
 # ajout de la satisfaction vis-à-vis de la gestion épidémique 
 
-Modele4<-lm(C2GERCMPTCORO_1~C2GERB4_7+C2GERSEXE+C2GERAGER_1+C2GERAGER_2+C2GERAGER_3+C2GEREDU+C2GERRISKGEN_1+C2GERGER5+C2GERB4_0+C2GERB4_6+C2GERCONF1_2+C2GERSATISCORGERST,data=datasub2)
+Modele4<-lm(`Eternuer dans le coude`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Aversion au risque`+`Risque de contamination`+`Confiance dans le gouvernement du pays`+`Confiance dans le gouvernement fédéral`+`Confiance sociale`,data=datasub2)
 
 # effet cumulatif 
-Modele5<-lm(C2GERCMPTCORO_1~C2GERB4_7+C2GERSEXE+C2GERAGER_1+C2GERAGER_2+C2GERAGER_3+C2GEREDU+C2GERRISKGEN_1+C2GERGER5+C2GERB4_0+C2GERB4_6+C2GERCONF1_2+C2GERSATISCORGERST+(C2GERB4_7*C2GERRISKGEN_1),data=datasub2)
+Modele5<-lm(`Eternuer dans le coude`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Aversion au risque`+`Risque de contamination`+`Confiance dans le gouvernement du pays`+`Confiance dans le gouvernement fédéral`+`Confiance sociale`+(`Confiance dans les scientifiques`*`Aversion au risque`),data=datasub2)
 
 # modèle complet
-Modele6<-lm(C2GERCMPTCORO_1~C2GERSEXE+C2GERAGER_1+C2GERAGER_2+C2GERRISKGEN_1+C2GERSATISCORGERST,data=datasub2)
+Modele6<-lm(`Eternuer dans le coude`~`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Aversion au risque`,data=datasub2)
 
 library(sjPlot)
 
@@ -518,33 +524,33 @@ tab_model(
   dv.labels = c("(1)","(2)","(3)","(4)","(5)","(6)"))
 ```
 
-## C1GERCMPTCORO_2 
+## `Se serrer les mains` 
 
 ```{r}
-Modele0<-lm(C1GERCMPTCORO_2~C1GERB4_7,
+Modele0<-lm(`Se serrer les mains`~`Confiance dans les scientifiques`,
             data=datasub1)
 
 # ajout des caractéristiques individuelles : sexe, âge, éducation et état de santé
-Modele1<-lm(C1GERCMPTCORO_2~C1GERB4_7+C1GERSEXE+C1GERAGER_1+C1GERAGER_2+C1GERAGER_3+C1GEREDU,data=datasub1)
+Modele1<-lm(`Se serrer les mains`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`,data=datasub1)
 
 # ajout de l'aversité face au risque et perception de la menace
 
-Modele2<-lm(C1GERCMPTCORO_2~C1GERB4_7+C1GERSEXE+C1GERAGER_1+C1GERAGER_2+C1GERAGER_3+C1GEREDU+C1GERRISKGEN_1+C1GERGER5,data=datasub1)
+Modele2<-lm(`Se serrer les mains`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Aversion au risque`+`Risque de contamination`,data=datasub1)
 
 # ajout des différents types de confiance la confiance politique (gouvernement et gouvernement fédéral) et sociale  
 
-Modele3<-lm(C1GERCMPTCORO_2~C1GERB4_7+C1GERSEXE+C1GERAGER_1+C1GERAGER_2+C1GERAGER_3+C1GEREDU+C1GERRISKGEN_1+C1GERGER5+C1GERB4_0+C1GERB4_6+C1GERCONF1_2,data=datasub1)
+Modele3<-lm(`Se serrer les mains`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Aversion au risque`+`Risque de contamination`+`Confiance dans le gouvernement du pays`+`Confiance dans le gouvernement fédéral`+`Confiance sociale`,data=datasub1)
 
 # ajout de la satisfaction vis-à-vis de la gestion épidémique 
 
-Modele4<-lm(C1GERCMPTCORO_2~C1GERB4_7+C1GERSEXE+C1GERAGER_1+C1GERAGER_2+C1GERAGER_3+C1GEREDU+C1GERRISKGEN_1+C1GERGER5+C1GERB4_0+C1GERB4_6+C1GERCONF1_2+C1GERGER4ST,data=datasub1)
+Modele4<-lm(`Se serrer les mains`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Aversion au risque`+`Risque de contamination`+`Confiance dans le gouvernement du pays`+`Confiance dans le gouvernement fédéral`+`Confiance sociale`,data=datasub1)
 
 # effet cumulatif
-Modele5<-lm(C1GERCMPTCORO_2~C1GERB4_7+C1GERSEXE+C1GERAGER_1+C1GERAGER_2+C1GERAGER_3+C1GEREDU+C1GERRISKGEN_1+C1GERGER5+C1GERB4_0+C1GERB4_6+C1GERCONF1_2+C1GERGER4ST+(C1GERB4_7*C1GERRISKGEN_1),data=datasub1)
+Modele5<-lm(`Se serrer les mains`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Aversion au risque`+`Risque de contamination`+`Confiance dans le gouvernement du pays`+`Confiance dans le gouvernement fédéral`+`Confiance sociale`+(`Confiance dans les scientifiques`*`Aversion au risque`),data=datasub1)
 
 # modèle complet
 
-Modele6<-lm(C1GERCMPTCORO_2~C1GERB4_7+C1GERSEXE+C1GERAGER_1+C1GERAGER_2+C1GERRISKGEN_1+C1GERGER5+C1GERB4_0,data=datasub1)
+Modele6<-lm(`Se serrer les mains`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Aversion au risque`+`Risque de contamination`+`Confiance dans le gouvernement du pays`,data=datasub1)
 
 tab_model(
   Modele1,Modele2,Modele3,Modele4,Modele5,Modele6,
@@ -561,33 +567,33 @@ tab_model(
   dv.labels = c("(1)","(2)","(3)","(4)","(5)","(6)"))
 ```
 
-## C2GERCMPTCORO_2
+## `Se serrer les mains`
 
 ```{r}
 
-Modele0<-lm(C2GERCMPTCORO_2~C2GERB4_7,
+Modele0<-lm(`Se serrer les mains`~`Confiance dans les scientifiques`,
             data=datasub2)
 
 # ajout des caractéristiques individuelles : sexe, âge, éducation et état de santé
-Modele1<-lm(C2GERCMPTCORO_2~C2GERB4_7+C2GERSEXE+C2GERAGER_1+C2GERAGER_2+C2GERAGER_3+C2GEREDU,data=datasub2)
+Modele1<-lm(`Se serrer les mains`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`,data=datasub2)
 
 # ajout de l'aversion face au risque et perception de la menace
 
-Modele2<-lm(C2GERCMPTCORO_2~C2GERB4_7+C2GERSEXE+C2GERAGER_1+C2GERAGER_2+C2GERAGER_3+C2GEREDU+C2GERRISKGEN_1+C2GERGER5,data=datasub2)
+Modele2<-lm(`Se serrer les mains`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Aversion au risque`+`Risque de contamination`,data=datasub2)
 
 # ajout des différents types de confiance la confiance politique (gouvernement et gouvernement fédéral) et sociale  
 
-Modele3<-lm(C2GERCMPTCORO_2~C2GERB4_7+C2GERSEXE+C2GERAGER_1+C2GERAGER_2+C2GERAGER_3+C2GEREDU+C2GERRISKGEN_1+C2GERGER5+C2GERB4_0+C2GERB4_6+C2GERCONF1_2,data=datasub2)
+Modele3<-lm(`Se serrer les mains`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Aversion au risque`+`Risque de contamination`+`Confiance dans le gouvernement du pays`+`Confiance dans le gouvernement fédéral`+`Confiance sociale`,data=datasub2)
 
 # ajout de la satisfaction vis-à-vis de la gestion épidémique 
 
-Modele4<-lm(C2GERCMPTCORO_2~C2GERB4_7+C2GERSEXE+C2GERAGER_1+C2GERAGER_2+C2GERAGER_3+C2GEREDU+C2GERRISKGEN_1+C2GERGER5+C2GERB4_0+C2GERB4_6+C2GERCONF1_2+C2GERSATISCORGERST,data=datasub2)
+Modele4<-lm(`Se serrer les mains`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Aversion au risque`+`Risque de contamination`+`Confiance dans le gouvernement du pays`+`Confiance dans le gouvernement fédéral`+`Confiance sociale`,data=datasub2)
 
 # effet cumulatif 
-Modele5<-lm(C2GERCMPTCORO_2~C2GERB4_7+C2GERSEXE+C2GERAGER_1+C2GERAGER_2+C2GERAGER_3+C2GEREDU+C2GERRISKGEN_1+C2GERGER5+C2GERB4_0+C2GERB4_6+C2GERCONF1_2+C2GERSATISCORGERST+(C2GERB4_7*C2GERRISKGEN_1),data=datasub2)
+Modele5<-lm(`Se serrer les mains`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Aversion au risque`+`Risque de contamination`+`Confiance dans le gouvernement du pays`+`Confiance dans le gouvernement fédéral`+`Confiance sociale`+(`Confiance dans les scientifiques`*`Aversion au risque`),data=datasub2)
 
 # modèle complet
-Modele6<-lm(C2GERCMPTCORO_2~C2GERB4_7+C2GERSEXE+C2GERAGER_1+C2GERAGER_2+C2GERRISKGEN_1+C2GERGER5+C2GERSATISCORGERST,data=datasub2)
+Modele6<-lm(`Se serrer les mains`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Aversion au risque`+`Risque de contamination`,data=datasub2)
 
 library(sjPlot)
 
@@ -607,33 +613,33 @@ tab_model(
 ```
 
 
-## C1GERCMPTCORO_3 
+## `1m de distance` 
 
 ```{r}
-Modele0<-lm(C1GERCMPTCORO_3~C1GERB4_7,
+Modele0<-lm(`1m de distance`~`Confiance dans les scientifiques`,
             data=datasub1)
 
 # ajout des caractéristiques individuelles : sexe, âge, éducation et état de santé
-Modele1<-lm(C1GERCMPTCORO_3~C1GERB4_7+C1GERSEXE+C1GERAGER_1+C1GERAGER_2+C1GERAGER_3+C1GEREDU,data=datasub1)
+Modele1<-lm(`1m de distance`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`,data=datasub1)
 
 # ajout de l'aversité face au risque et perception de la menace
 
-Modele2<-lm(C1GERCMPTCORO_3~C1GERB4_7+C1GERSEXE+C1GERAGER_1+C1GERAGER_2+C1GERAGER_3+C1GEREDU+C1GERRISKGEN_1+C1GERGER5,data=datasub1)
+Modele2<-lm(`1m de distance`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Aversion au risque`+`Risque de contamination`,data=datasub1)
 
 # ajout des différents types de confiance la confiance politique (gouvernement et gouvernement fédéral) et sociale  
 
-Modele3<-lm(C1GERCMPTCORO_3~C1GERB4_7+C1GERSEXE+C1GERAGER_1+C1GERAGER_2+C1GERAGER_3+C1GEREDU+C1GERRISKGEN_1+C1GERGER5+C1GERB4_0+C1GERB4_6+C1GERCONF1_2,data=datasub1)
+Modele3<-lm(`1m de distance`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Aversion au risque`+`Risque de contamination`+`Confiance dans le gouvernement du pays`+`Confiance dans le gouvernement fédéral`+`Confiance sociale`,data=datasub1)
 
 # ajout de la satisfaction vis-à-vis de la gestion épidémique 
 
-Modele4<-lm(C1GERCMPTCORO_3~C1GERB4_7+C1GERSEXE+C1GERAGER_1+C1GERAGER_2+C1GERAGER_3+C1GEREDU+C1GERRISKGEN_1+C1GERGER5+C1GERB4_0+C1GERB4_6+C1GERCONF1_2+C1GERGER4ST,data=datasub1)
+Modele4<-lm(`1m de distance`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Aversion au risque`+`Risque de contamination`+`Confiance dans le gouvernement du pays`+`Confiance dans le gouvernement fédéral`+`Confiance sociale`,data=datasub1)
 
 # effet cumulatif
-Modele5<-lm(C1GERCMPTCORO_3~C1GERB4_7+C1GERSEXE+C1GERAGER_1+C1GERAGER_2+C1GERAGER_3+C1GEREDU+C1GERRISKGEN_1+C1GERGER5+C1GERB4_0+C1GERB4_6+C1GERCONF1_2+C1GERGER4ST+(C1GERB4_7*C1GERRISKGEN_1),data=datasub1)
+Modele5<-lm(`1m de distance`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Aversion au risque`+`Risque de contamination`+`Confiance dans le gouvernement du pays`+`Confiance dans le gouvernement fédéral`+`Confiance sociale`+(`Confiance dans les scientifiques`*`Aversion au risque`),data=datasub1)
 
 # modèle complet
 
-Modele6<-lm(C1GERCMPTCORO_3~C1GERSEXE+C1GERAGER_1+C1GERAGER_2+C1GERRISKGEN_1+C1GERGER5+C1GERB4_0,data=datasub1)
+Modele6<-lm(`1m de distance`~`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Aversion au risque`+`Risque de contamination`+`Confiance dans le gouvernement du pays`,data=datasub1)
 
 tab_model(
   Modele1,Modele2,Modele3,Modele4,Modele5,Modele6,
@@ -650,33 +656,33 @@ tab_model(
   dv.labels = c("(1)","(2)","(3)","(4)","(5)","(6)"))
 ```
 
-## C2GERCMPTCORO_3 
+## `1m de distance` 
 
 ```{r}
 
-Modele0<-lm(C2GERCMPTCORO_3~C2GERB4_7,
+Modele0<-lm(`1m de distance`~`Confiance dans les scientifiques`,
             data=datasub2)
 
 # ajout des caractéristiques individuelles : sexe, âge, éducation et état de santé
-Modele1<-lm(C2GERCMPTCORO_3~C2GERB4_7+C2GERSEXE+C2GERAGER_1+C2GERAGER_2+C2GERAGER_3+C2GEREDU,data=datasub2)
+Modele1<-lm(`1m de distance`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`,data=datasub2)
 
 # ajout de l'aversion face au risque et perception de la menace
 
-Modele2<-lm(C2GERCMPTCORO_3~C2GERB4_7+C2GERSEXE+C2GERAGER_1+C2GERAGER_2+C2GERAGER_3+C2GEREDU+C2GERRISKGEN_1+C2GERGER5,data=datasub2)
+Modele2<-lm(`1m de distance`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Aversion au risque`+`Risque de contamination`,data=datasub2)
 
 # ajout des différents types de confiance la confiance politique (gouvernement et gouvernement fédéral) et sociale  
 
-Modele3<-lm(C2GERCMPTCORO_3~C2GERB4_7+C2GERSEXE+C2GERAGER_1+C2GERAGER_2+C2GERAGER_3+C2GEREDU+C2GERRISKGEN_1+C2GERGER5+C2GERB4_0+C2GERB4_6+C2GERCONF1_2,data=datasub2)
+Modele3<-lm(`1m de distance`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Aversion au risque`+`Risque de contamination`+`Confiance dans le gouvernement du pays`+`Confiance dans le gouvernement fédéral`+`Confiance sociale`,data=datasub2)
 
 # ajout de la satisfaction vis-à-vis de la gestion épidémique 
 
-Modele4<-lm(C2GERCMPTCORO_3~C2GERB4_7+C2GERSEXE+C2GERAGER_1+C2GERAGER_2+C2GERAGER_3+C2GEREDU+C2GERRISKGEN_1+C2GERGER5+C2GERB4_0+C2GERB4_6+C2GERCONF1_2+C2GERSATISCORGERST,data=datasub2)
+Modele4<-lm(`1m de distance`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Aversion au risque`+`Risque de contamination`+`Confiance dans le gouvernement du pays`+`Confiance dans le gouvernement fédéral`+`Confiance sociale`,data=datasub2)
 
 # effet cumulatif 
-Modele5<-lm(C2GERCMPTCORO_3~C2GERB4_7+C2GERSEXE+C2GERAGER_1+C2GERAGER_2+C2GERAGER_3+C2GEREDU+C2GERRISKGEN_1+C2GERGER5+C2GERB4_0+C2GERB4_6+C2GERCONF1_2+C2GERSATISCORGERST+(C2GERB4_7*C2GERRISKGEN_1),data=datasub2)
+Modele5<-lm(`1m de distance`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Aversion au risque`+`Risque de contamination`+`Confiance dans le gouvernement du pays`+`Confiance dans le gouvernement fédéral`+`Confiance sociale`+(`Confiance dans les scientifiques`*`Aversion au risque`),data=datasub2)
 
 # modèle complet
-Modele6<-lm(C2GERCMPTCORO_3~C2GERB4_7+C2GERSEXE+C2GERAGER_1+C2GERAGER_2+C2GERRISKGEN_1+C2GERGER5+C2GERSATISCORGERST,data=datasub2)
+Modele6<-lm(`1m de distance`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Aversion au risque`+`Risque de contamination`,data=datasub2)
 
 library(sjPlot)
 
@@ -695,33 +701,33 @@ tab_model(
   dv.labels = c("(1)","(2)","(3)","(4)","(5)","(6)"))
 ```
 
-## C1GERCMPTCORO_4 
+## `Réduire les mouvements` 
 
 ```{r}
-Modele0<-lm(C1GERCMPTCORO_4~C1GERB4_7,
+Modele0<-lm(`Réduire les mouvements`~`Confiance dans les scientifiques`,
             data=datasub1)
 
 # ajout des caractéristiques individuelles : sexe, âge, éducation et état de santé
-Modele1<-lm(C1GERCMPTCORO_4~C1GERB4_7+C1GERSEXE+C1GERAGER_1+C1GERAGER_2+C1GERAGER_3+C1GEREDU,data=datasub1)
+Modele1<-lm(`Réduire les mouvements`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`,data=datasub1)
 
 # ajout de l'aversité face au risque et perception de la menace
 
-Modele2<-lm(C1GERCMPTCORO_4~C1GERB4_7+C1GERSEXE+C1GERAGER_1+C1GERAGER_2+C1GERAGER_3+C1GEREDU+C1GERRISKGEN_1+C1GERGER5,data=datasub1)
+Modele2<-lm(`Réduire les mouvements`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Aversion au risque`+`Risque de contamination`,data=datasub1)
 
 # ajout des différents types de confiance la confiance politique (gouvernement et gouvernement fédéral) et sociale  
 
-Modele3<-lm(C1GERCMPTCORO_4~C1GERB4_7+C1GERSEXE+C1GERAGER_1+C1GERAGER_2+C1GERAGER_3+C1GEREDU+C1GERRISKGEN_1+C1GERGER5+C1GERB4_0+C1GERB4_6+C1GERCONF1_2,data=datasub1)
+Modele3<-lm(`Réduire les mouvements`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Aversion au risque`+`Risque de contamination`+`Confiance dans le gouvernement du pays`+`Confiance dans le gouvernement fédéral`+`Confiance sociale`,data=datasub1)
 
 # ajout de la satisfaction vis-à-vis de la gestion épidémique 
 
-Modele4<-lm(C1GERCMPTCORO_4~C1GERB4_7+C1GERSEXE+C1GERAGER_1+C1GERAGER_2+C1GERAGER_3+C1GEREDU+C1GERRISKGEN_1+C1GERGER5+C1GERB4_0+C1GERB4_6+C1GERCONF1_2+C1GERGER4ST,data=datasub1)
+Modele4<-lm(`Réduire les mouvements`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Aversion au risque`+`Risque de contamination`+`Confiance dans le gouvernement du pays`+`Confiance dans le gouvernement fédéral`+`Confiance sociale`,data=datasub1)
 
 # effet cumulatif
-Modele5<-lm(C1GERCMPTCORO_4~C1GERB4_7+C1GERSEXE+C1GERAGER_1+C1GERAGER_2+C1GERAGER_3+C1GEREDU+C1GERRISKGEN_1+C1GERGER5+C1GERB4_0+C1GERB4_6+C1GERCONF1_2+C1GERGER4ST+(C1GERB4_7*C1GERRISKGEN_1),data=datasub1)
+Modele5<-lm(`Réduire les mouvements`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Aversion au risque`+`Risque de contamination`+`Confiance dans le gouvernement du pays`+`Confiance dans le gouvernement fédéral`+`Confiance sociale`+(`Confiance dans les scientifiques`*`Aversion au risque`),data=datasub1)
 
 # modèle complet
 
-Modele6<-lm(C1GERCMPTCORO_4~C1GERB4_7+C1GERSEXE+C1GERAGER_1+C1GERAGER_2+C1GERRISKGEN_1+C1GERGER5+C1GERB4_0+C1GERB4_6,data=datasub1)
+Modele6<-lm(`Réduire les mouvements`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Aversion au risque`+`Risque de contamination`+`Confiance dans le gouvernement du pays`+`Confiance dans le gouvernement fédéral`,data=datasub1)
 
 tab_model(
   Modele1,Modele2,Modele3,Modele4,Modele5,Modele6,
@@ -738,33 +744,33 @@ tab_model(
   dv.labels = c("(1)","(2)","(3)","(4)","(5)","(6)"))
 ```
 
-## C2GERCMPTCORO_4
+## `Réduire les mouvements`
 
 ```{r}
 
-Modele0<-lm(C2GERCMPTCORO_4~C2GERB4_7,
+Modele0<-lm(`Réduire les mouvements`~`Confiance dans les scientifiques`,
             data=datasub2)
 
 # ajout des caractéristiques individuelles : sexe, âge, éducation et état de santé
-Modele1<-lm(C2GERCMPTCORO_4~C2GERB4_7+C2GERSEXE+C2GERAGER_1+C2GERAGER_2+C2GERAGER_3+C2GEREDU,data=datasub2)
+Modele1<-lm(`Réduire les mouvements`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`,data=datasub2)
 
 # ajout de l'aversion face au risque et perception de la menace
 
-Modele2<-lm(C2GERCMPTCORO_4~C2GERB4_7+C2GERSEXE+C2GERAGER_1+C2GERAGER_2+C2GERAGER_3+C2GEREDU+C2GERRISKGEN_1+C2GERGER5,data=datasub2)
+Modele2<-lm(`Réduire les mouvements`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Aversion au risque`+`Risque de contamination`,data=datasub2)
 
 # ajout des différents types de confiance la confiance politique (gouvernement et gouvernement fédéral) et sociale  
 
-Modele3<-lm(C2GERCMPTCORO_4~C2GERB4_7+C2GERSEXE+C2GERAGER_1+C2GERAGER_2+C2GERAGER_3+C2GEREDU+C2GERRISKGEN_1+C2GERGER5+C2GERB4_0+C2GERB4_6+C2GERCONF1_2,data=datasub2)
+Modele3<-lm(`Réduire les mouvements`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Aversion au risque`+`Risque de contamination`+`Confiance dans le gouvernement du pays`+`Confiance dans le gouvernement fédéral`+`Confiance sociale`,data=datasub2)
 
 # ajout de la satisfaction vis-à-vis de la gestion épidémique 
 
-Modele4<-lm(C2GERCMPTCORO_4~C2GERB4_7+C2GERSEXE+C2GERAGER_1+C2GERAGER_2+C2GERAGER_3+C2GEREDU+C2GERRISKGEN_1+C2GERGER5+C2GERB4_0+C2GERB4_6+C2GERCONF1_2+C2GERSATISCORGERST,data=datasub2)
+Modele4<-lm(`Réduire les mouvements`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Aversion au risque`+`Risque de contamination`+`Confiance dans le gouvernement du pays`+`Confiance dans le gouvernement fédéral`+`Confiance sociale`,data=datasub2)
 
 # effet cumulatif 
-Modele5<-lm(C2GERCMPTCORO_4~C2GERB4_7+C2GERSEXE+C2GERAGER_1+C2GERAGER_2+C2GERAGER_3+C2GEREDU+C2GERRISKGEN_1+C2GERGER5+C2GERB4_0+C2GERB4_6+C2GERCONF1_2+C2GERSATISCORGERST+(C2GERB4_7*C2GERRISKGEN_1),data=datasub2)
+Modele5<-lm(`Réduire les mouvements`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Aversion au risque`+`Risque de contamination`+`Confiance dans le gouvernement du pays`+`Confiance dans le gouvernement fédéral`+`Confiance sociale`+(`Confiance dans les scientifiques`*`Aversion au risque`),data=datasub2)
 
 # modèle complet
-Modele6<-lm(C2GERCMPTCORO_4~C2GERSEXE+C2GERAGER_1+C2GERAGER_2+C2GERRISKGEN_1+C2GERGER5+C2GERSATISCORGERST,data=datasub2)
+Modele6<-lm(`Réduire les mouvements`~`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Aversion au risque`+`Risque de contamination`,data=datasub2)
 
 library(sjPlot)
 
@@ -783,33 +789,33 @@ tab_model(
   dv.labels = c("(1)","(2)","(3)","(4)","(5)","(6)"))
 ```
 
-## C1GERCMPTCORO_5 
+## `Eviter les endroits bondés` 
 
 ```{r}
-Modele0<-lm(C1GERCMPTCORO_5~C1GERB4_7,
+Modele0<-lm(`Eviter les endroits bondés`~`Confiance dans les scientifiques`,
             data=datasub1)
 
 # ajout des caractéristiques individuelles : sexe, âge, éducation et état de santé
-Modele1<-lm(C1GERCMPTCORO_5~C1GERB4_7+C1GERSEXE+C1GERAGER_1+C1GERAGER_2+C1GERAGER_3+C1GEREDU,data=datasub1)
+Modele1<-lm(`Eviter les endroits bondés`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`,data=datasub1)
 
 # ajout de l'aversité face au risque et perception de la menace
 
-Modele2<-lm(C1GERCMPTCORO_5~C1GERB4_7+C1GERSEXE+C1GERAGER_1+C1GERAGER_2+C1GERAGER_3+C1GEREDU+C1GERRISKGEN_1+C1GERGER5,data=datasub1)
+Modele2<-lm(`Eviter les endroits bondés`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Aversion au risque`+`Risque de contamination`,data=datasub1)
 
 # ajout des différents types de confiance la confiance politique (gouvernement et gouvernement fédéral) et sociale  
 
-Modele3<-lm(C1GERCMPTCORO_5~C1GERB4_7+C1GERSEXE+C1GERAGER_1+C1GERAGER_2+C1GERAGER_3+C1GEREDU+C1GERRISKGEN_1+C1GERGER5+C1GERB4_0+C1GERB4_6+C1GERCONF1_2,data=datasub1)
+Modele3<-lm(`Eviter les endroits bondés`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Aversion au risque`+`Risque de contamination`+`Confiance dans le gouvernement du pays`+`Confiance dans le gouvernement fédéral`+`Confiance sociale`,data=datasub1)
 
 # ajout de la satisfaction vis-à-vis de la gestion épidémique 
 
-Modele4<-lm(C1GERCMPTCORO_5~C1GERB4_7+C1GERSEXE+C1GERAGER_1+C1GERAGER_2+C1GERAGER_3+C1GEREDU+C1GERRISKGEN_1+C1GERGER5+C1GERB4_0+C1GERB4_6+C1GERCONF1_2+C1GERGER4ST,data=datasub1)
+Modele4<-lm(`Eviter les endroits bondés`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Aversion au risque`+`Risque de contamination`+`Confiance dans le gouvernement du pays`+`Confiance dans le gouvernement fédéral`+`Confiance sociale`,data=datasub1)
 
 # effet cumulatif
-Modele5<-lm(C1GERCMPTCORO_5~C1GERB4_7+C1GERSEXE+C1GERAGER_1+C1GERAGER_2+C1GERAGER_3+C1GEREDU+C1GERRISKGEN_1+C1GERGER5+C1GERB4_0+C1GERB4_6+C1GERCONF1_2+C1GERGER4ST+(C1GERB4_7*C1GERRISKGEN_1),data=datasub1)
+Modele5<-lm(`Eviter les endroits bondés`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Aversion au risque`+`Risque de contamination`+`Confiance dans le gouvernement du pays`+`Confiance dans le gouvernement fédéral`+`Confiance sociale`+(`Confiance dans les scientifiques`*`Aversion au risque`),data=datasub1)
 
 # modèle complet
 
-Modele6<-lm(C1GERCMPTCORO_5~C1GERB4_7+C1GERSEXE+C1GERAGER_1+C1GERAGER_2+C1GERRISKGEN_1+C1GERGER5,data=datasub1)
+Modele6<-lm(`Eviter les endroits bondés`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Aversion au risque`+`Risque de contamination`,data=datasub1)
 
 tab_model(
   Modele1,Modele2,Modele3,Modele4,Modele5,Modele6,
@@ -826,33 +832,33 @@ tab_model(
   dv.labels = c("(1)","(2)","(3)","(4)","(5)","(6)"))
 ```
 
-## C2GERCMPTCORO_5
+## `Eviter les endroits bondés`
 
 ```{r}
 
-Modele0<-lm(C2GERCMPTCORO_5~C2GERB4_7,
+Modele0<-lm(`Eviter les endroits bondés`~`Confiance dans les scientifiques`,
             data=datasub2)
 
 # ajout des caractéristiques individuelles : sexe, âge, éducation et état de santé
-Modele1<-lm(C2GERCMPTCORO_5~C2GERB4_7+C2GERSEXE+C2GERAGER_1+C2GERAGER_2+C2GERAGER_3+C2GEREDU,data=datasub2)
+Modele1<-lm(`Eviter les endroits bondés`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`,data=datasub2)
 
 # ajout de l'aversion face au risque et perception de la menace
 
-Modele2<-lm(C2GERCMPTCORO_5~C2GERB4_7+C2GERSEXE+C2GERAGER_1+C2GERAGER_2+C2GERAGER_3+C2GEREDU+C2GERRISKGEN_1+C2GERGER5,data=datasub2)
+Modele2<-lm(`Eviter les endroits bondés`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Aversion au risque`+`Risque de contamination`,data=datasub2)
 
 # ajout des différents types de confiance la confiance politique (gouvernement et gouvernement fédéral) et sociale  
 
-Modele3<-lm(C2GERCMPTCORO_5~C2GERB4_7+C2GERSEXE+C2GERAGER_1+C2GERAGER_2+C2GERAGER_3+C2GEREDU+C2GERRISKGEN_1+C2GERGER5+C2GERB4_0+C2GERB4_6+C2GERCONF1_2,data=datasub2)
+Modele3<-lm(`Eviter les endroits bondés`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Aversion au risque`+`Risque de contamination`+`Confiance dans le gouvernement du pays`+`Confiance dans le gouvernement fédéral`+`Confiance sociale`,data=datasub2)
 
 # ajout de la satisfaction vis-à-vis de la gestion épidémique 
 
-Modele4<-lm(C2GERCMPTCORO_5~C2GERB4_7+C2GERSEXE+C2GERAGER_1+C2GERAGER_2+C2GERAGER_3+C2GEREDU+C2GERRISKGEN_1+C2GERGER5+C2GERB4_0+C2GERB4_6+C2GERCONF1_2+C2GERSATISCORGERST,data=datasub2)
+Modele4<-lm(`Eviter les endroits bondés`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Aversion au risque`+`Risque de contamination`+`Confiance dans le gouvernement du pays`+`Confiance dans le gouvernement fédéral`+`Confiance sociale`,data=datasub2)
 
 # effet cumulatif 
-Modele5<-lm(C2GERCMPTCORO_5~C2GERB4_7+C2GERSEXE+C2GERAGER_1+C2GERAGER_2+C2GERAGER_3+C2GEREDU+C2GERRISKGEN_1+C2GERGER5+C2GERB4_0+C2GERB4_6+C2GERCONF1_2+C2GERSATISCORGERST+(C2GERB4_7*C2GERRISKGEN_1),data=datasub2)
+Modele5<-lm(`Eviter les endroits bondés`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Aversion au risque`+`Risque de contamination`+`Confiance dans le gouvernement du pays`+`Confiance dans le gouvernement fédéral`+`Confiance sociale`+(`Confiance dans les scientifiques`*`Aversion au risque`),data=datasub2)
 
 # modèle complet
-Modele6<-lm(C2GERCMPTCORO_5~C2GERB4_7+C2GERSEXE+C2GERAGER_1+C2GERAGER_2+C2GERRISKGEN_1+C2GERGER5+C2GERSATISCORGERST,data=datasub2)
+Modele6<-lm(`Eviter les endroits bondés`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Aversion au risque`+`Risque de contamination`,data=datasub2)
 
 library(sjPlot)
 
@@ -871,33 +877,33 @@ tab_model(
   dv.labels = c("(1)","(2)","(3)","(4)","(5)","(6)"))
 ```
 
-## C1GERCMPTCORO_6 
+## `Voir ses amis` 
 
 ```{r}
-Modele0<-lm(C1GERCMPTCORO_6~C1GERB4_7,
+Modele0<-lm(`Voir ses amis`~`Confiance dans les scientifiques`,
             data=datasub1)
 
 # ajout des caractéristiques individuelles : sexe, âge, éducation et état de santé
-Modele1<-lm(C1GERCMPTCORO_6~C1GERB4_7+C1GERSEXE+C1GERAGER_1+C1GERAGER_2+C1GERAGER_3+C1GEREDU,data=datasub1)
+Modele1<-lm(`Voir ses amis`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`,data=datasub1)
 
 # ajout de l'aversité face au risque et perception de la menace
 
-Modele2<-lm(C1GERCMPTCORO_6~C1GERB4_7+C1GERSEXE+C1GERAGER_1+C1GERAGER_2+C1GERAGER_3+C1GEREDU+C1GERRISKGEN_1+C1GERGER5,data=datasub1)
+Modele2<-lm(`Voir ses amis`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Aversion au risque`+`Risque de contamination`,data=datasub1)
 
 # ajout des différents types de confiance la confiance politique (gouvernement et gouvernement fédéral) et sociale  
 
-Modele3<-lm(C1GERCMPTCORO_6~C1GERB4_7+C1GERSEXE+C1GERAGER_1+C1GERAGER_2+C1GERAGER_3+C1GEREDU+C1GERRISKGEN_1+C1GERGER5+C1GERB4_0+C1GERB4_6+C1GERCONF1_2,data=datasub1)
+Modele3<-lm(`Voir ses amis`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Aversion au risque`+`Risque de contamination`+`Confiance dans le gouvernement du pays`+`Confiance dans le gouvernement fédéral`+`Confiance sociale`,data=datasub1)
 
 # ajout de la satisfaction vis-à-vis de la gestion épidémique 
 
-Modele4<-lm(C1GERCMPTCORO_6~C1GERB4_7+C1GERSEXE+C1GERAGER_1+C1GERAGER_2+C1GERAGER_3+C1GEREDU+C1GERRISKGEN_1+C1GERGER5+C1GERB4_0+C1GERB4_6+C1GERCONF1_2+C1GERGER4ST,data=datasub1)
+Modele4<-lm(`Voir ses amis`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Aversion au risque`+`Risque de contamination`+`Confiance dans le gouvernement du pays`+`Confiance dans le gouvernement fédéral`+`Confiance sociale`,data=datasub1)
 
 # effet cumulatif
-Modele5<-lm(C1GERCMPTCORO_6~C1GERB4_7+C1GERSEXE+C1GERAGER_1+C1GERAGER_2+C1GERAGER_3+C1GEREDU+C1GERRISKGEN_1+C1GERGER5+C1GERB4_0+C1GERB4_6+C1GERCONF1_2+C1GERGER4ST+(C1GERB4_7*C1GERRISKGEN_1),data=datasub1)
+Modele5<-lm(`Voir ses amis`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Aversion au risque`+`Risque de contamination`+`Confiance dans le gouvernement du pays`+`Confiance dans le gouvernement fédéral`+`Confiance sociale`+(`Confiance dans les scientifiques`*`Aversion au risque`),data=datasub1)
 
 # modèle complet
 
-Modele6<-lm(C1GERCMPTCORO_6~C1GERSEXE+C1GERAGER_1+C1GERAGER_2+C1GERRISKGEN_1+C1GERGER5+C1GERB4_0,data=datasub1)
+Modele6<-lm(`Voir ses amis`~`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Aversion au risque`+`Risque de contamination`+`Confiance dans le gouvernement du pays`,data=datasub1)
 
 tab_model(
   Modele1,Modele2,Modele3,Modele4,Modele5,Modele6,
@@ -914,33 +920,33 @@ tab_model(
   dv.labels = c("(1)","(2)","(3)","(4)","(5)","(6)"))
 ```
 
-## C2GERCMPTCORO_6 
+## `Voir ses amis` 
 
 ```{r}
 
-Modele0<-lm(C2GERCMPTCORO_6~C2GERB4_7,
+Modele0<-lm(`Voir ses amis`~`Confiance dans les scientifiques`,
             data=datasub2)
 
 # ajout des caractéristiques individuelles : sexe, âge, éducation et état de santé
-Modele1<-lm(C2GERCMPTCORO_6~C2GERB4_7+C2GERSEXE+C2GERAGER_1+C2GERAGER_2+C2GERAGER_3+C2GEREDU,data=datasub2)
+Modele1<-lm(`Voir ses amis`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`,data=datasub2)
 
 # ajout de l'aversion face au risque et perception de la menace
 
-Modele2<-lm(C2GERCMPTCORO_6~C2GERB4_7+C2GERSEXE+C2GERAGER_1+C2GERAGER_2+C2GERAGER_3+C2GEREDU+C2GERRISKGEN_1+C2GERGER5,data=datasub2)
+Modele2<-lm(`Voir ses amis`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Aversion au risque`+`Risque de contamination`,data=datasub2)
 
 # ajout des différents types de confiance la confiance politique (gouvernement et gouvernement fédéral) et sociale  
 
-Modele3<-lm(C2GERCMPTCORO_6~C2GERB4_7+C2GERSEXE+C2GERAGER_1+C2GERAGER_2+C2GERAGER_3+C2GEREDU+C2GERRISKGEN_1+C2GERGER5+C2GERB4_0+C2GERB4_6+C2GERCONF1_2,data=datasub2)
+Modele3<-lm(`Voir ses amis`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Aversion au risque`+`Risque de contamination`+`Confiance dans le gouvernement du pays`+`Confiance dans le gouvernement fédéral`+`Confiance sociale`,data=datasub2)
 
 # ajout de la satisfaction vis-à-vis de la gestion épidémique 
 
-Modele4<-lm(C2GERCMPTCORO_6~C2GERB4_7+C2GERSEXE+C2GERAGER_1+C2GERAGER_2+C2GERAGER_3+C2GEREDU+C2GERRISKGEN_1+C2GERGER5+C2GERB4_0+C2GERB4_6+C2GERCONF1_2+C2GERSATISCORGERST,data=datasub2)
+Modele4<-lm(`Voir ses amis`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Aversion au risque`+`Risque de contamination`+`Confiance dans le gouvernement du pays`+`Confiance dans le gouvernement fédéral`+`Confiance sociale`,data=datasub2)
 
 # effet cumulatif 
-Modele5<-lm(C2GERCMPTCORO_6~C2GERB4_7+C2GERSEXE+C2GERAGER_1+C2GERAGER_2+C2GERAGER_3+C2GEREDU+C2GERRISKGEN_1+C2GERGER5+C2GERB4_0+C2GERB4_6+C2GERCONF1_2+C2GERSATISCORGERST+(C2GERB4_7*C2GERRISKGEN_1),data=datasub2)
+Modele5<-lm(`Voir ses amis`~`Confiance dans les scientifiques`+`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Âge [50-59]`+`Education`+`Aversion au risque`+`Risque de contamination`+`Confiance dans le gouvernement du pays`+`Confiance dans le gouvernement fédéral`+`Confiance sociale`+(`Confiance dans les scientifiques`*`Aversion au risque`),data=datasub2)
 
 # modèle complet
-Modele6<-lm(C2GERCMPTCORO_6~C2GERSEXE+C2GERAGER_1+C2GERAGER_2+C2GERRISKGEN_1+C2GERGER5+C2GERCONF1_2+C2GERSATISCORGERST,data=datasub2)
+Modele6<-lm(`Voir ses amis`~`Sexe`+`Âge [18-34]`+`Âge [35-49]`+`Aversion au risque`+`Risque de contamination`+`Confiance sociale`,data=datasub2)
 
 library(sjPlot)
 
